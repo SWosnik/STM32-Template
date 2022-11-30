@@ -1,26 +1,26 @@
 # name of executable
 
-ELF=$(notdir $(CURDIR)).elf                    
+ELF=$(notdir $(CURDIR)).elf
 
 # Tool path
 
-TOOLROOT=/l/arm/codesourcery/bin
+TOOLROOT=
 
 # Library path
 
-LIBROOT=/l/arm/STM32F10x_StdPeriph_Lib_V3.5.0
+LIBROOT=../STM32CubeF1
 
 # Tools
 
-CC=$(TOOLROOT)/arm-none-eabi-gcc
-LD=$(TOOLROOT)/arm-none-eabi-gcc
-AR=$(TOOLROOT)/arm-none-eabi-ar
-AS=$(TOOLROOT)/arm-none-eabi-as
+CC=$(TOOLROOT)arm-none-eabi-gcc
+LD=$(TOOLROOT)arm-none-eabi-gcc
+AR=$(TOOLROOT)arm-none-eabi-ar
+AS=$(TOOLROOT)arm-none-eabi-as
 
 # Code Paths
 
-DEVICE=$(LIBROOT)/Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x
-CORE=$(LIBROOT)/Libraries/CMSIS/CM3/CoreSupport
+DEVICE=$(LIBROOT)/Drivers/CMSIS/Device/ST/STM32F1xx
+CORE=$(LIBROOT)/Drivers/CMSIS/Core/Include
 PERIPH=$(LIBROOT)/Libraries/STM32F10x_StdPeriph_Driver
 
 # Search path for standard files
@@ -31,7 +31,7 @@ vpath %.c $(TEMPLATEROOT)
 
 vpath %.c $(CORE)
 vpath %.c $(PERIPH)/src
-vpath %.c $(DEVICE)
+vpath %.c $(DEVICE)/source/Templates
 
 # Search path for Library
 
@@ -41,21 +41,21 @@ vpath %.c $(TEMPLATEROOT)/Library
 
 #  Processor specific
 
-PTYPE = STM32F10X_MD_VL 
+PTYPE = STM32F100xB
 LDSCRIPT = $(TEMPLATEROOT)/stm32f100.ld
-STARTUP= startup_stm32f10x.o system_stm32f10x.o 
+STARTUP= startup_stm32f10x.o system_stm32f1xx.o
 
 # Compilation Flags
 
-FULLASSERT = -DUSE_FULL_ASSERT 
+FULLASSERT = -DUSE_FULL_ASSERT
 
-LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 
-CFLAGS+= -mcpu=cortex-m3 -mthumb 
-CFLAGS+= -I$(TEMPLATEROOT) -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I.
+LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 -specs=nano.specs -specs=nosys.specs
+CFLAGS+= -mcpu=cortex-m3 -mthumb
+CFLAGS+= -I$(TEMPLATEROOT) -I$(DEVICE)/Include -I$(CORE) -I$(PERIPH)/inc -I.
 CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT)
 CFLAGS+= -I$(TEMPLATEROOT)/Library/ff9/src -I$(TEMPLATEROOT)/Library
 
-# Build executable 
+# Build executable
 
 $(ELF) : $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
@@ -70,7 +70,7 @@ $(ELF) : $(OBJS)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d) $(ELF) startup_stm32f* $(CLEANOTHER)
+	del /S /Q $(OBJS) $(OBJS:.o=.d) $(ELF) startup_stm32f* $(CLEANOTHER)
 
 debug: $(ELF)
 	arm-none-eabi-gdb $(ELF)
