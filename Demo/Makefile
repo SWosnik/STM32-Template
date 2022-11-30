@@ -1,13 +1,19 @@
+TARGET = Demo.elf
+
 TEMPLATEROOT = ..
+
+BUILD_DIR=./build/
 
 # compilation flags for gdb
 
 CFLAGS  = -O1 -g
-ASFLAGS = -g 
+ASFLAGS = -g
 
 # object files
 
-OBJS=  $(STARTUP) main.o
+vpath %.c ./src
+
+OBJS=  $(STARTUP) $(BUILD_DIR)main.o
 
 # include common make file
 
